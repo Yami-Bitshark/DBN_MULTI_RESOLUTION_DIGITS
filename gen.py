@@ -26,8 +26,5 @@ if img.shape != (11,7):
 for i in range(2,8):
     y=cv2.resize(img,tup(i),interpolation=cv2.INTER_CUBIC)
     y=cv2.equalizeHist(y)
-    print y.shape
-    y=cv2.resize(y,(7,11),interpolation=cv2.INTER_CUBIC)
-    y=cv2.equalizeHist(y)
     cv2.imwrite("exp/"+str(sys.argv[2])+"_"+str(tup(i)[1])+"x"+str(tup(i)[0])+".png",y)
 
