@@ -452,7 +452,7 @@ def dbTester(fol):
 ####################################  main  #########################################################
 
 if __name__=='__main__':
-    fich=open("report.txt","w")
+    #fich=open("report.txt","w")
     dbn_list=[]
     for i in range(2,8):
         dat,lab=db_load(tup(i),i)
@@ -482,49 +482,55 @@ if __name__=='__main__':
             #print sampleClassificationReport
 ################# reporting ################################
 
-    conf2=testAnalyse_allSeq("test-multi")
-    print conf2[0]
-#    conf1=dbTester("test-multi")
+    conf1=dbTester("test-multi")
+    np.savetxt("csv/test-multi.csv",conf1,delimiter=',')
 #    fich.write("Report for test-multi: \n")
 #    fich.write("global confusion matrix: \n")
 #    fich.write(str(conf1))
 #    fich.write("\n \n")
 #    fich.write("all sequences: \n")
-#    conf2=testAnalyse_allSeq("test-multi")
-#    for i in range(0,10):
+    conf2=testAnalyse_allSeq("test-multi")
+    for i in range(0,10):
 #        fich.write("****************for the digit{}: \n".format(i))
+
+        np.savetxt("csv/test-multi-"+str(i)+".csv",conf2[i],delimiter=',')
 #        fich.write(str(conf2[i]))
 #        fich.write("\n \n")
 #    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
-#    conf1=dbTester("test-multi-noise")
+    conf1=dbTester("test-multi-noise")
+    np.savetxt("csv/test-multi-noise.csv",conf1,delimiter=',')
 #    fich.write("Report for test-multi-noise: \n")
 #    fich.write("global confusion matrix: \n")
 #    fich.write(str(conf1))
 #    fich.write("\n \n")
 #    fich.write("all sequences: \n")
-#    conf2=testAnalyse_allSeq_noise("test-multi-noise")
-#    for i in range(0,10):
+    conf2=testAnalyse_allSeq_noise("test-multi-noise")
+    for i in range(0,10):
 #        fich.write("****************for the digit{}: \n".format(i))
+        np.savetxt("csv/test-multi-noise-"+str(i)+".csv",conf2[i],delimiter=',')
 #        fich.write(str(conf2[i]))
 #        fich.write("\n \n")
 #    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
-#    conf1=dbTester("db-multi-noise")
+    conf1=dbTester("db-multi-noise")
+    np.savetxt("csv/db-multi-noise.csv",conf1,delimiter=',')
 #    fich.write("Report for db-multi-noise: \n")
 #    fich.write("global confusion matrix: \n")
 #    fich.write(str(conf1))
 #    fich.write("\n \n")
 #    fich.write("all sequences: \n")
 #    conf1=testAnalyse_allSeq_noise("db-multi-noise")
-#    for i in range(0,10):
+    for i in range(0,10):
 #        fich.write("****************for the digit{}: \n".format(i))
+        np.savetxt("csv/db-multi-noise-"+str(i)+".csv",conf1[i],delimiter=',')
 #        fich.write(str(conf2[i]))
 #        fich.write("\n \n")
 #    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
-#    confn=tst_seq_noise()
+    confn=tst_seq_noise()
 #    fich.write("Report for test-seq-noise: \n")
 #    fich.write("global confusion matrix: \n")
-#    for i in range(0,10):
-#        fich.write("****************for the digit{}: \n".format(i))
+    for i in range(0,10):
+#        fich.write("********p********for the digit{}: \n".format(i))
+        np.savetxt("csv/test-seq-noise-"+str(i)+".csv",confn[i],delimiter=',')
 #        fich.write(str(confn[i]))
 #        fich.write("\n \n")
 #    fich.close()
