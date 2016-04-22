@@ -249,6 +249,7 @@ def foldAnalyse(dst):
             #for i in range(0,10):
             #    print "Estimation for {}: {}%".format(i,PD[i])
             print "Estimated Digit is : {}".format(np.argmax(PD))
+            print PD*100.0
             #raw_input("Press enter or space ...") 
             return PD,np.argmax(PD),tot
 
@@ -378,7 +379,7 @@ def testAnalyse_allSeq_noise(dst):
              path=os.listdir(dst+"/"+str(i)+"/")
              for S in [(2,2),(3,2),(3,3),(4,3),(4,4),(5,2),(5,4),(5,5),(6,3),(6,4),(6,5),(6,6),(7,7),(8,3),(8,4),(8,5),(8,6),(8,8),(9,6),(9,7),(9,9),(10,4),(10,5),(10,8),(10,10),(11,7)]:
                  tot=0.0
-                 print "treating {}".format(S)
+                 print "Processing {}".format(S)
                  for fld in path:
                      tot+=1.0
                      fldd=dst+"/"+str(i)+"/"+fld
@@ -386,13 +387,35 @@ def testAnalyse_allSeq_noise(dst):
                                 a= foldAnalysei_one_size(fldd,S,l+str(i))
                                 conf[i][k][a[1]]+=a[0]
                                 conf[i][k][a[3]]+=a[2]
-                 conf[i][k]=conf[i][k]/tot*100.0
+                 conf[i][k]=conf[i][k]/np.sum(conf[i][k])*100.0
                  k+=1
 
          return conf
 
-
+####################################################################################
             
+def tst_seq_noise():
+    conf=np.zeros((10,6,10),dtype=np.float16)
+    db="test-seq-noise"
+    for (j,fl) in [ (i,"{}/{}".format(db,i)) for i in range(0,10) ]:
+        k=0
+        for i in range(2,8):
+            res=str(tup(i))+"x"+str(i)
+            chm=fl+"/"+res
+            #PD,argm,_=foldAnalyse(chm)
+            for im in os.listdir(chm):
+                img=cv2.imread(chm+"/"+im,0)
+                img=cv2.equalizeHist(img)
+                img=img.reshape(1,i*tup(i))/255.0
+                #prediction:
+                pred=dbn_list[k].predict(img)
+                conf[j][k][pred[0]]+=1
+            k+=1
+        for k in range(0,6):
+            conf[j][k]=conf[j][k]/np.sum(conf[j][k])*100.0
+    return conf
+
+
 
 
 
@@ -458,69 +481,80 @@ if __name__=='__main__':
             sampleClassificationReport=classification_report(labt,preds)
             #print sampleClassificationReport
 ################# reporting ################################
-    conf1=dbTester("test-multi")
-    fich.write("Report for test-multi: \n")
-    fich.write("global confusion matrix: \n")
-    fich.write(str(conf1))
-    fich.write("\n \n")
-    fich.write("all sequences: \n")
+
     conf2=testAnalyse_allSeq("test-multi")
-    for i in range(0,10):
-        fich.write("****************for the digit{}: \n".format(i))
-        fich.write(str(conf2[i]))
-        fich.write("\n \n")
-    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
-    conf1=dbTester("test-multi-noise")
-    fich.write("Report for test-multi-noise: \n")
-    fich.write("global confusion matrix: \n")
-    fich.write(str(conf1))
-    fich.write("\n \n")
-    fich.write("all sequences: \n")
-    conf2=testAnalyse_allSeq_noise("test-multi-noise")
-    for i in range(0,10):
-        fich.write("****************for the digit{}: \n".format(i))
-        fich.write(str(conf2[i]))
-        fich.write("\n \n")
-    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
-    conf1=dbTester("db-multi-noise")
-    fich.write("Report for db-multi-noise: \n")
-    fich.write("global confusion matrix: \n")
-    fich.write(str(conf1))
-    fich.write("\n \n")
-    fich.write("all sequences: \n")
-    conf1=testAnalyse_allSeq_noise("db-multi-noise")
-    for i in range(0,10):
-        fich.write("****************for the digit{}: \n".format(i))
-        fich.write(str(conf2[i]))
-        fich.write("\n \n")
-    fich.close()
-    while(1):
-        dst="."
-        dst=str(raw_input("image or sequence folder to test? \'q\' to quit:\n"))
-        if dst == "q":
-            break
-        elif os.path.isfile(dst):
-            try:
-                k=0
-                for i in range(2,8):
-
-                    img=cv2.imread(dst,0)
-                    img=cv2.equalizeHist(img)
-                    if img.shape != (tup(i),i):
-                        img=cv2.resize(img,(i,tup(i)),interpolation=cv2.INTER_CUBIC)
-                    img=img.reshape(1,i*tup(i))/255.0
-                    
-                    #prediction:
-                    pred=dbn_list[k].predict(img)
-                    k=k+1
-                    print "prediction for ({},{}) : {}".format(tup(i),i,pred)
-
-            except:
-                print "error reading image.."
-            
-        elif os.path.isdir(dst):
-           foldAnalyse(dst) 
-
-        else:
-            print "input error"
-
+    print conf2[0]
+#    conf1=dbTester("test-multi")
+#    fich.write("Report for test-multi: \n")
+#    fich.write("global confusion matrix: \n")
+#    fich.write(str(conf1))
+#    fich.write("\n \n")
+#    fich.write("all sequences: \n")
+#    conf2=testAnalyse_allSeq("test-multi")
+#    for i in range(0,10):
+#        fich.write("****************for the digit{}: \n".format(i))
+#        fich.write(str(conf2[i]))
+#        fich.write("\n \n")
+#    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
+#    conf1=dbTester("test-multi-noise")
+#    fich.write("Report for test-multi-noise: \n")
+#    fich.write("global confusion matrix: \n")
+#    fich.write(str(conf1))
+#    fich.write("\n \n")
+#    fich.write("all sequences: \n")
+#    conf2=testAnalyse_allSeq_noise("test-multi-noise")
+#    for i in range(0,10):
+#        fich.write("****************for the digit{}: \n".format(i))
+#        fich.write(str(conf2[i]))
+#        fich.write("\n \n")
+#    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
+#    conf1=dbTester("db-multi-noise")
+#    fich.write("Report for db-multi-noise: \n")
+#    fich.write("global confusion matrix: \n")
+#    fich.write(str(conf1))
+#    fich.write("\n \n")
+#    fich.write("all sequences: \n")
+#    conf1=testAnalyse_allSeq_noise("db-multi-noise")
+#    for i in range(0,10):
+#        fich.write("****************for the digit{}: \n".format(i))
+#        fich.write(str(conf2[i]))
+#        fich.write("\n \n")
+#    fich.write("\n\n********************************************************************************\n***********************************************\n\n")
+#    confn=tst_seq_noise()
+#    fich.write("Report for test-seq-noise: \n")
+#    fich.write("global confusion matrix: \n")
+#    for i in range(0,10):
+#        fich.write("****************for the digit{}: \n".format(i))
+#        fich.write(str(confn[i]))
+#        fich.write("\n \n")
+#    fich.close()
+#    while(1):
+#        dst="."
+#        dst=str(raw_input("image or sequence folder to test? \'q\' to quit:\n"))
+#        if dst == "q":
+#            break
+#        elif os.path.isfile(dst):
+#            try:
+#                k=0
+#                for i in range(2,8):
+#
+#                    img=cv2.imread(dst,0)
+#                    img=cv2.equalizeHist(img)
+#                    if img.shape != (tup(i),i):
+#                        img=cv2.resize(img,(i,tup(i)),interpolation=cv2.INTER_CUBIC)
+#                    img=img.reshape(1,i*tup(i))/255.0
+#                    
+#                    #prediction:
+#                    pred=dbn_list[k].predict(img)
+#                    k=k+1
+#                    print "prediction for ({},{}) : {}".format(tup(i),i,pred)
+#
+#            except:
+#                print "error reading image.."
+#            
+#        elif os.path.isdir(dst):
+#           foldAnalyse(dst) 
+#
+#        else:
+#            print "input error"
+#
